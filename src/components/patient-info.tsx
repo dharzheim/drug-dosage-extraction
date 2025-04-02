@@ -22,6 +22,7 @@ export default function PatientInfo({
         type="number"
         pattern="\d*"
         suffix="kg"
+        min="0"
         placeholder="Gewicht in kg"
         onChange={handleInputChange}
         value={weight}

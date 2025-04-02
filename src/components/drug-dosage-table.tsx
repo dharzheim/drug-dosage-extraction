@@ -5,7 +5,6 @@ import { useMemo } from 'react'
 import { isNullOrUndefined } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { fetchDrugDosages } from '@/api/fetch-drug-dosages'
-import { Skeleton } from '@/components/ui/skeleton'
 
 export type DosageErrorCode = 'drug-not-found' | 'appropriate-dosage-not-found' | null
 
@@ -50,7 +49,7 @@ export const DrugDosageTable = ({
   weight: number | ''
   drugNames: string[]
 }) => {
-  const { data: drugDosages, isLoading } = useQuery({
+  const { data: drugDosages } = useQuery({
     queryKey: ['drug-dosages', drugNames],
     queryFn: () => fetchDrugDosages({ drugNames }),
   })
@@ -77,7 +76,7 @@ export const DrugDosageTable = ({
       }
     })
   }, [weight, drugNames, drugDosages])
-  
+
   return (
     <>
       {drugDosages && (
@@ -85,7 +84,7 @@ export const DrugDosageTable = ({
           <TableHeader>
             <TableRow>
               <TableHead>Präparat</TableHead>
-              <TableHead>Dosierung</TableHead>
+              <TableHead className="w-1/3">Dosierung</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -97,16 +96,6 @@ export const DrugDosageTable = ({
                 </TableCell>
               </TableRow>
             ))}
-            {isLoading && (
-              <TableRow>
-                <TableCell>
-                  <Skeleton />
-                </TableCell>
-                <TableCell>
-                  <Skeleton />
-                </TableCell>
-              </TableRow>
-            )}
           </TableBody>
         </Table>
       )}
