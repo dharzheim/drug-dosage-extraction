@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { isNullOrUndefined } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { fetchDrugDosages } from '@/api/fetch-drug-dosages'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export type DosageErrorCode = 'drug-not-found' | 'appropriate-dosage-not-found' | null
 
@@ -49,7 +50,7 @@ export const DrugDosageTable = ({
   weight: number | ''
   drugNames: string[]
 }) => {
-  const { data: drugDosages } = useQuery({
+  const { data: drugDosages, isLoading } = useQuery({
     queryKey: ['drug-dosages', drugNames],
     queryFn: () => fetchDrugDosages({ drugNames }),
   })
@@ -93,6 +94,32 @@ export const DrugDosageTable = ({
                 <TableCell>{recommendation.drugName}</TableCell>
                 <TableCell>
                   {recommendation.dosage || mapDosageErrorCode(recommendation.errorCode)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+      {!drugDosages && isLoading && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-2/3">
+                <Skeleton className="h-3 w-[100px]" />
+              </TableHead>
+              <TableHead className="w-1/3">
+                <Skeleton className="h-3 w-[100px]" />
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[...Array(3)].map((_, i) => (
+              <TableRow key={i}>
+                <TableCell>
+                  <Skeleton className="h-3 w-[100px]" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-3 w-[100px]" />
                 </TableCell>
               </TableRow>
             ))}

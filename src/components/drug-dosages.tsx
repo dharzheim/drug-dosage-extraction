@@ -10,7 +10,7 @@ import PatientInfo from './patient-info'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 export const DrugDosages = () => {
-  const [weight, setWeight] = useState<number | ''>(0)
+  const [weight, setWeight] = useState<number | ''>('')
   const [extractedDrugNames, setExtractedDrugNames] = useState<string[]>([])
 
   const queryClient = new QueryClient()
