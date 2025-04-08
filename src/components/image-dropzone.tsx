@@ -62,8 +62,10 @@ export default function ImageDropzone({ handleFile }: { handleFile: (file: File)
     accept: { 'image/*': [] },
     maxFiles: 1,
     maxSize: 10485760,
-    onDrop: (acceptedFiles) => {
-      handleFile(acceptedFiles[0])
+    onDrop: (acceptedFiles, fileRejections) => {
+      if (fileRejections.length === 0) {
+        handleFile(acceptedFiles[0])
+      }
     },
   })
 

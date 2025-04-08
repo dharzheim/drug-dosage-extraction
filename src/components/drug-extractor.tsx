@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Tesseract, { createWorker } from 'tesseract.js'
 import ImageDropzone from '@/components/image-dropzone'
 import { Progress } from '@/components/ui/progress'
@@ -11,7 +11,7 @@ export default function DrugExtractor({
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [imageFile, setImageFile] = useState<File | null>(null)
+
   const [promisedWorker, setPromisedWorker] = useState<Promise<Tesseract.Worker> | null>(null)
 
   useEffect(() => {
@@ -33,38 +33,40 @@ export default function DrugExtractor({
     }
   }, [promisedWorker])
 
-  console.log(promisedWorker)
   const processFile = (file: File) => {
     setError(null)
     setProgress(0)
-    setImageFile(file)
+    extractTextFromImage(file).then((text) => {
+      if (text) {
+        onDrugNamesExtracted(text.split('\n').filter((drug) => drug))
+      }
+    })
   }
 
-  useEffect(() => {
-    if (!promisedWorker) return
-    if (!imageFile) return
-
-    async function extractTextFromImage(imageFile: File) {
+  const extractTextFromImage = useCallback(
+    async (imageFile: File) => {
+      if (promisedWorker === null) {
+        return
+      }
       setIsLoading(true)
-      setProgress(0) // Start progress tracking
-      const worker = (await promisedWorker) as Tesseract.Worker
+      setProgress(0)
+      const worker = await promisedWorker
 
       try {
         const {
           data: { text },
         } = await worker.recognize(imageFile)
-        onDrugNamesExtracted(text.split('\n').filter((drug) => drug))
+        return text
       } catch (err) {
         console.error('OCR Error:', err)
         setError('Error during OCR processing. Please try again or use a different image')
       } finally {
         setIsLoading(false)
-        setProgress(100) // Mark as complete
+        setProgress(100)
       }
-    }
-
-    extractTextFromImage(imageFile)
-  }, [onDrugNamesExtracted, imageFile, promisedWorker])
+    },
+    [promisedWorker],
+  )
 
   return (
     <>
